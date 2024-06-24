@@ -35,7 +35,20 @@ export default function WbHeader() {
               数据源
             </Text>
             </Link>
-            <Link href="#">
+
+            <Link href="/schema-sync">
+            <Text
+              color="white" // 正常状态下的颜色
+              _hover={{
+                color: 'pink.400', // 鼠标悬停时的颜色
+                cursor:"pointer"
+              }}
+            >
+              元数据同步
+            </Text>
+            </Link>
+
+            <Link href="/query">
             <Text
               color="white" // 正常状态下的颜色
               _hover={{
