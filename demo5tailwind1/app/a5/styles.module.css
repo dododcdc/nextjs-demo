@@ -1,0 +1,10 @@
+
+
+.abcd {
+    background-color: black;
+}
+
+
+.markdown > * {
+    all: revert;
+  }

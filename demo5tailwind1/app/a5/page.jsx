@@ -1,39 +1,29 @@
 'use client'
 
-import React, { useRef } from 'react';
+import 'github-markdown-css'
+import ReactMarkdown from "react-markdown";
+import gfm from 'remark-gfm';
+
+import style from  './styles.module.css'
+import Markdown from 'react-markdown';
+
+const PostContent = () => {
+
+    const source = `
+    # Hello, world!
+    `
 
 
-
-
-import { useState } from 'react';
-
-import ReactMarkdown from 'react-markdown';
-
-export default function a5() {
-
-
-    const markdownContent = `
-    # Hello World
-    
-    This is a **bold** and *italic* text.
-    
-    \`\`\`
-    console.log('Hello, world!');
-    \`\`\`
-    
-    - List item one
-    - List item two
-    
-    [Link to Google](https://www.google.com)
-  `;
-
-
+    const source2 = `
+# Hello, world!
+---
+~this doesn't work.~
+    `
     return (
-        <div>
-
-            <ReactMarkdown>{markdownContent}</ReactMarkdown>
-            
+        <div className={style.markdown}>
+            <ReactMarkdown  remarkPlugins={[gfm]} children={source2} />
         </div>
-    )
+    );
+};
 
-}
+export default PostContent;

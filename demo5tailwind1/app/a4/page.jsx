@@ -11,6 +11,8 @@ import Markdown from 'react-markdown'
 
 import { ChatGroq } from "@langchain/groq";
 
+import style from './styles.module.css'
+
 
 
 
@@ -50,13 +52,13 @@ const ChatMessage = ({ message, isUser }) => {
                             
 
                             return (
-                                <div key={index}>
+                                <div  key={index}>
 
                                     {
                                         // 根据下标判断是代码块还是普通文字
                                         index % 2 == 1 ? 
                                             <CodeBlock code={xdd.substring(xdd.indexOf('\n') + 1)} /> 
-                                        :xdd
+                                        : <Markdown className={style.markdown} children={xdd} /> 
                                         
                                     }
                                 </div>
@@ -65,7 +67,7 @@ const ChatMessage = ({ message, isUser }) => {
                         }
                         )
                         // 如果ai返回的内容没有代码块直接展示
-                        : (<div>  {message} </div>)
+                        : (<div className={style.markdown}  > <Markdown children={message} />   </div>)
                 }
 
             </div>
