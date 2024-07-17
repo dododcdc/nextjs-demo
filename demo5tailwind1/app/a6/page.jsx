@@ -5,8 +5,6 @@
 
 
 
-import { Remark } from 'react-remark';
-
 
 const a6 = () => {
 
@@ -15,12 +13,11 @@ const a6 = () => {
 
         <div>
 
-<Remark>{`
-# header
+            <div className="abcd text-white text-2xl text-center mt-10">This is a6 page</div>
 
-1. ordered
-2. list
-`}</Remark>
+        
+
+
 
 
         </div>

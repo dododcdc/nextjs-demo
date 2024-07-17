@@ -13,6 +13,8 @@ import { ChatGroq } from "@langchain/groq";
 
 import style from './styles.module.css'
 
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dark,materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
 
@@ -33,7 +35,7 @@ const ChatMessage = ({ message, isUser }) => {
     const arr = message.split('```')
 
 
-    
+
 
 
 
@@ -42,33 +44,31 @@ const ChatMessage = ({ message, isUser }) => {
     return (
 
         <div className={`flex ${isUser ? 'flex-row-reverse' : ''}  rounded-lg  mb-4`}>
-            <div className={` rounded-lg p-3 ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}>
+            <div className={` rounded-lg p-3 ${isUser ? 'bg-blue-500 text-white' : ' bg-gray-300'}`}>
 
 
-                {
-                    // 数组长度大于0说明ai返回的内容有代码，需要对代码内容和非代码内容做不同的展示处理
-                    arr.length > 0 ?
-                        arr.map((xdd, index) => {
-                            
-
-                            return (
-                                <div  key={index}>
-
-                                    {
-                                        // 根据下标判断是代码块还是普通文字
-                                        index % 2 == 1 ? 
-                                            <CodeBlock code={xdd.substring(xdd.indexOf('\n') + 1)} /> 
-                                        : <Markdown className={style.markdown} children={xdd} /> 
-                                        
-                                    }
-                                </div>
+            <Markdown
+                    children={message}
+                    components={{
+                        code(props) {
+                            const { children, className, node, ...rest } = props
+                            const match = /language-(\w+)/.exec(className || '')
+                            return match ? (
+                                <SyntaxHighlighter
+                                    {...rest}
+                                    PreTag="div"
+                                    children={String(children).replace(/\n$/, '')}
+                                    language={match[1]}
+                                    style={materialDark}
+                                />
+                            ) : (
+                                <code {...rest} className={className}>
+                                    {children}
+                                </code>
                             )
-
                         }
-                        )
-                        // 如果ai返回的内容没有代码块直接展示
-                        : (<div className={style.markdown}  > <Markdown children={message} />   </div>)
-                }
+                    }}
+                />
 
             </div>
         </div>
@@ -108,7 +108,7 @@ const ChatInterface = () => {
 
 
     useEffect(() => {
-        
+
         // 每次消息更新后，滚动到底部
         const element = rollRef.current;
         if (element) {
@@ -139,7 +139,7 @@ const ChatInterface = () => {
 
                 str = str + `${chunk.choices[0]?.delta?.content}`
 
-                
+
 
                 setMessages([...messages, { text: msg, isUser: true }, { text: str, isUser: false }]);
 
