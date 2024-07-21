@@ -12,7 +12,6 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 
-
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -124,7 +123,7 @@ const ChatInterface = () => {
 
                 ))}
             </div>
-            <form className='flex md:4 ' onSubmit={ (event) => {
+            <form className='w-full flex justify-center md:4 ' onSubmit={ (event) => {
                 event.preventDefault();
 
                 handleSendMessage();
@@ -132,7 +131,7 @@ const ChatInterface = () => {
 
                 <input
                     type="text"
-                    className="w-full p-2 border border-gray-300 rounded-lg mr-2"
+                    className="basis-2/3 p-2 border border-gray-300 rounded-lg mr-2"
                     placeholder="Type your message here..."
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
