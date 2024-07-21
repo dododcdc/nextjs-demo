@@ -11,16 +11,11 @@ import remarkGfm from 'remark-gfm'
 const PostContent = () => {
 
     const source = `
-# Hello, world!
-*  ggg
-*  ddd 
-
-- yy
-
-> yyyyyy
-
-###  tmmgg
-    `
+| Feature    | Support              |
+| ---------: | :------------------- |
+| CommonMark | 100%                 |
+| GFM        | 100% w/ ~remark-gfm~ |
+`
     const markdown = `
 # hello 
 > ggggggggg
@@ -29,6 +24,9 @@ console.log('It works!')
 ~~~`
     return (
         <div >
+
+            
+            <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]} children={source} />
             {
                 // eslint-disable-next-line
                 // <ReactMarkdown remarkPlugins={[remarkGfm]} children={markdown} className="markdown-body" />

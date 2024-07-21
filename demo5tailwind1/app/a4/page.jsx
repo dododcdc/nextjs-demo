@@ -9,12 +9,14 @@ import { useState, useEffect } from 'react';
 
 import Markdown from 'react-markdown'
 
+import remarkGfm from 'remark-gfm'
+
 import { ChatGroq } from "@langchain/groq";
 
 import style from './styles.module.css'
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark,materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { dark, materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
 
@@ -46,8 +48,10 @@ const ChatMessage = ({ message, isUser }) => {
         <div className={`flex ${isUser ? 'flex-row-reverse' : ''}  rounded-lg  mb-4`}>
             <div className={` rounded-lg p-3 ${isUser ? 'bg-blue-500 text-white' : ' bg-gray-300'}`}>
 
-
-            <Markdown
+                
+                <Markdown
+                
+                    remarkPlugins={[remarkGfm]}
                     children={message}
                     components={{
                         code(props) {
@@ -69,6 +73,7 @@ const ChatMessage = ({ message, isUser }) => {
                         }
                     }}
                 />
+            
 
             </div>
         </div>
