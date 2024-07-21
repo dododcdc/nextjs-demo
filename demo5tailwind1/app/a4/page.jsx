@@ -1,47 +1,23 @@
 'use client'
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 
 import OpenAI from 'openai';
 
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
-import Markdown from 'react-markdown'
+import Markdown from 'react-markdown';
 
-import remarkGfm from 'remark-gfm'
+import remarkGfm from 'remark-gfm';
 
-import { ChatGroq } from "@langchain/groq";
 
-import style from './styles.module.css'
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark, materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-
-
-
-
-const CodeBlock = ({ code }) => (
-
-
-    <pre className="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
-        <code>{code}</code>
-    </pre>
-);
 
 const ChatMessage = ({ message, isUser }) => {
-
-
-    // 将消息分为代码块和非代码块
-    const arr = message.split('```')
-
-
-
-
-
-
-
 
     return (
 
@@ -83,13 +59,9 @@ const ChatMessage = ({ message, isUser }) => {
 
 const ChatInterface = () => {
 
-
-
     const [model, setModel] = useState()
 
     useEffect(() => {
-
-
         setModel(new OpenAI(
 
             {
@@ -103,11 +75,9 @@ const ChatInterface = () => {
     }, [])
 
 
-
     const [messages, setMessages] = useState([]);
 
     const [inputMessage, setInputMessage] = useState('');
-
 
     const rollRef = useRef();
 
@@ -123,8 +93,6 @@ const ChatInterface = () => {
 
 
 
-
-
     const handleSendMessage = async () => {
 
         const msg = inputMessage
@@ -132,8 +100,6 @@ const ChatInterface = () => {
         if (msg.trim() !== '') {
 
             setMessages([...messages, { text: msg, isUser: true }]);
-
-
             const stream = await model.chat.completions.create({
                 model: 'deepseek-coder',
                 messages: [{ role: 'user', content: msg }],
@@ -141,20 +107,9 @@ const ChatInterface = () => {
             });
             let str = ''
             for await (const chunk of stream) {
-
                 str = str + `${chunk.choices[0]?.delta?.content}`
-
-
-
                 setMessages([...messages, { text: msg, isUser: true }, { text: str, isUser: false }]);
-
-
             }
-
-
-
-
-
 
         }
     };
@@ -169,7 +124,11 @@ const ChatInterface = () => {
 
                 ))}
             </div>
-            <div className='flex md:4 ' >
+            <form className='flex md:4 ' onSubmit={ (event) => {
+                event.preventDefault();
+
+                handleSendMessage();
+            }  }>
 
                 <input
                     type="text"
@@ -180,11 +139,11 @@ const ChatInterface = () => {
                 />
                 <button type='submit'
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-                    onClick={handleSendMessage}
+                    
                 >
                     Send
                 </button>
-            </div>
+            </form>
 
         </div>
     );

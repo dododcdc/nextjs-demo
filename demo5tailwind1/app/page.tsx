@@ -1,52 +1,152 @@
-import Image from "next/image";
+'use client'
+import { useRef } from 'react';
 
-import apng from '@/public/images/a.png'
-
-export default function Home() {
-  return (
-    <main >
+import OpenAI from 'openai';
 
 
-
-      <div className="w-2/3 flex justify-center items-center bg-black">
-
-        <div className="w-64 bg-pink-400" >gg</div>
+import { useEffect, useState } from 'react';
 
 
-        <div className='text-white bg-blue-500'>
-          <strong>Andrew Alfred</strong><br></br>
-          <span>Technical advisor</span>
+import Markdown from 'react-markdown';
+
+import remarkGfm from 'remark-gfm';
+
+
+
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+
+const ChatMessage = ({ message, isUser }) => {
+
+    return (
+
+        <div className={`flex ${isUser ? 'flex-row-reverse' : ''}  rounded-lg  mb-4`}>
+            <div className={` rounded-lg p-3 ${isUser ? 'bg-blue-500 text-white' : ' bg-gray-300'}`}>
+
+                
+                <Markdown
+                
+                    remarkPlugins={[remarkGfm]}
+                    children={message}
+                    components={{
+                        code(props) {
+                            const { children, className, node, ...rest } = props
+                            const match = /language-(\w+)/.exec(className || '')
+                            return match ? (
+                                <SyntaxHighlighter
+                                    {...rest}
+                                    PreTag="div"
+                                    children={String(children).replace(/\n$/, '')}
+                                    language={match[1]}
+                                    style={materialDark}
+                                />
+                            ) : (
+                                <code {...rest} className={className}>
+                                    {children}
+                                </code>
+                            )
+                        }
+                    }}
+                />
+            
+
+            </div>
         </div>
-      </div>
+    )
 
-      <div className="w-full  flex   justify-center ">
-        <div className="table  w-2/3 bg-gradient-to-r from-pink-500 to-blue-400  rounded-lg ...">
-          <div className="table-header-group font-bold  bg-gray-500 ...">
-            <div className="table-row rounded-lg ">
-              <div className="table-cell text-left rounded-tl-lg ...">Song</div>
-              <div className="table-cell text-left ...">Artist</div>
-              <div className="table-cell text-left rounded-tr-lg  ...">Year</div>
+};
+
+const ChatInterface = () => {
+
+    const [model, setModel] = useState()
+
+    useEffect(() => {
+        setModel(new OpenAI(
+
+            {
+                baseURL: 'https://api.deepseek.com',
+                apiKey: process.env.NEXT_PUBLIC_API_KEY_DEEP_SEEK,
+                dangerouslyAllowBrowser: true
+            }
+        ))
+
+
+    }, [])
+
+
+    const [messages, setMessages] = useState([]);
+
+    const [inputMessage, setInputMessage] = useState('');
+
+    const rollRef = useRef();
+
+
+    useEffect(() => {
+
+        // 每次消息更新后，滚动到底部
+        const element = rollRef.current;
+        if (element) {
+            element.scrollTop = element.scrollHeight;
+        }
+    }, [messages]);
+
+
+
+    const handleSendMessage = async () => {
+
+        const msg = inputMessage
+        setInputMessage('');
+        if (msg.trim() !== '') {
+
+            setMessages([...messages, { text: msg, isUser: true }]);
+            const stream = await model.chat.completions.create({
+                model: 'deepseek-coder',
+                messages: [{ role: 'user', content: msg }],
+                stream: true,
+            });
+            let str = ''
+            for await (const chunk of stream) {
+                str = str + `${chunk.choices[0]?.delta?.content}`
+                setMessages([...messages, { text: msg, isUser: true }, { text: str, isUser: false }]);
+            }
+
+        }
+    };
+
+    return (
+        <div className="flex flex-col h-screen bg-gray-100">
+
+            <div ref={rollRef} className="flex-1 p-4 overflow-y-auto">
+                {messages.map((msg, index) => (
+
+                    <ChatMessage key={index} message={msg.text} isUser={msg.isUser} />
+
+                ))}
             </div>
-          </div>
-          <div className="table-row-group ">
-            <div className="table-row hover:bg-yellow-300 ">
-              <div className="table-cell ...">The Sliding Mr. Bones (Next Stop, Pottersville)</div>
-              <div className="table-cell ...">Malcolm Lockyer</div>
-              <div className="table-cell ...">1961</div>
-            </div>
-            <div className="table-row">
-              <div className="table-cell ...">Witchy Woman</div>
-              <div className="table-cell ...">The Eagles</div>
-              <div className="table-cell ...">1972</div>
-            </div>
-            <div className="table-row">
-              <div className="table-cell ...">Shining Star</div>
-              <div className="table-cell ...">Earth, Wind, and Fire</div>
-              <div className="table-cell ...">1975</div>
-            </div>
-          </div>
+            <form className='flex md:4 ' onSubmit={ (event) => {
+                event.preventDefault();
+
+                handleSendMessage();
+            }  }>
+
+                <input
+                    type="text"
+                    className="w-full p-2 border border-gray-300 rounded-lg mr-2"
+                    placeholder="Type your message here..."
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                />
+                <button type='submit'
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                    
+                >
+                    Send
+                </button>
+            </form>
+
         </div>
-      </div>
-    </main>
-  );
-}
+    );
+};
+
+export default ChatInterface;
