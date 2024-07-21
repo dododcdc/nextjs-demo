@@ -62,7 +62,6 @@ const ChatInterface = () => {
 
     useEffect(() => {
         setModel(new OpenAI(
-
             {
                 baseURL: 'https://api.deepseek.com',
                 apiKey: process.env.NEXT_PUBLIC_API_KEY_DEEP_SEEK,

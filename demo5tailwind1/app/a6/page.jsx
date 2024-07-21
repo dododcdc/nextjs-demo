@@ -13,7 +13,7 @@ const ChatMessage = ({ isUser, msg }) => {
     )
 
 }
-const a6 = () => {
+const A6 = () => {
 
     const [messages, setMessages] = useState([
         {
@@ -73,4 +73,4 @@ const a6 = () => {
     );
 }
 
-export default a6;
+export default A6;
