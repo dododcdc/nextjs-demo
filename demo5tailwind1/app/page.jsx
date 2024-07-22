@@ -4,6 +4,10 @@ import { useRef } from 'react';
 import OpenAI from 'openai';
 
 
+
+import { HumanMessage } from '@langchain/core/messages';
+
+
 import { useEffect, useState } from 'react';
 
 
@@ -16,18 +20,18 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
-const ChatMessage = ({ message, isUser }) => {
+const ChatMessage = ({ content, role }) => {
 
     return (
 
-        <div className={`flex ${isUser ? 'flex-row-reverse' : ''}  rounded-lg  mb-4`}>
-            <div className={` rounded-lg p-3 ${isUser ? 'bg-blue-500 text-white' : ' bg-gray-300'}`}>
+        <div className={`flex ${role === 'user' ? 'flex-row-reverse' : ''}  rounded-lg  mb-4`}>
+            <div className={` rounded-lg p-3 ${role === 'user' ? 'bg-blue-500 text-white' : ' bg-gray-300'}`}>
 
-                
+
                 <Markdown
-                
+
                     remarkPlugins={[remarkGfm]}
-                    children={message}
+                    children={content}
                     components={{
                         code(props) {
                             const { children, className, node, ...rest } = props
@@ -48,7 +52,7 @@ const ChatMessage = ({ message, isUser }) => {
                         }
                     }}
                 />
-            
+
 
             </div>
         </div>
@@ -60,6 +64,8 @@ const ChatInterface = () => {
 
     const [model, setModel] = useState()
 
+
+
     useEffect(() => {
         setModel(new OpenAI(
             {
@@ -67,13 +73,12 @@ const ChatInterface = () => {
                 apiKey: process.env.NEXT_PUBLIC_API_KEY_DEEP_SEEK,
                 dangerouslyAllowBrowser: true
             }
-        ))
-
-
+        ));
     }, [])
 
 
     const [messages, setMessages] = useState([]);
+    const [messageCount, setMessageCount] = useState(0);
 
     const [inputMessage, setInputMessage] = useState('');
 
@@ -90,43 +95,77 @@ const ChatInterface = () => {
     }, [messages]);
 
 
+    useEffect(() => {
+        // 如果messages的长度为奇数，那么就发送消息
+       if(messageCount>=1) {
+        sendMessage()
+       }
+           
+        
+
+    },[messageCount])
+
+    const sendMessage = async () => {
+
+        const stream = await model.chat.completions.create({
+            model: 'deepseek-coder',
+            messages: messages,
+            stream: true,
+        });
+        let str = ''
+        for await (const chunk of stream) {
+            str = str + `${chunk.choices[0]?.delta?.content}`
+            setMessages([...messages,  { role: 'assistant', content: str }]);
+        }
+
+        setInputMessage('')
+
+    }
+
+
 
     const handleSendMessage = async () => {
 
-        const msg = inputMessage
-        setInputMessage('');
-        if (msg.trim() !== '') {
 
-            setMessages([...messages, { text: msg, isUser: true }]);
-            const stream = await model.chat.completions.create({
-                model: 'deepseek-coder',
-                messages: [{ role: 'user', content: msg }],
-                stream: true,
-            });
-            let str = ''
-            for await (const chunk of stream) {
-                str = str + `${chunk.choices[0]?.delta?.content}`
-                setMessages([...messages, { text: msg, isUser: true }, { text: str, isUser: false }]);
-            }
+        setMessages([...messages, { role: 'user', content: inputMessage }]);
 
-        }
+        // const msg = inputMessage
+        // setInputMessage('');
+        // if (msg.trim() !== '') {
+        //     setMessages([...messages, { role: 'user', content: msg }]);
+        //     const stream = await model.chat.completions.create({
+        //         model: 'deepseek-coder',
+        //         messages: [{role: 'user', content: "hi"},{role: 'assistant', content: "hello"}],
+        //         stream: true,
+        //     });
+        //     let str = ''
+        //     for await (const chunk of stream) {
+        //         str = str + `${chunk.choices[0]?.delta?.content}`
+        //         setMessages([...messages, { role: 'user', content: msg }, { role: 'assistant', content: str }]);
+        //     }
+
+        // }
     };
+
 
     return (
         <div className="flex flex-col h-screen bg-gray-100">
 
             <div ref={rollRef} className="flex-1 p-4 overflow-y-auto">
-                {messages.map((msg, index) => (
+                {messages.map((message, index) => (
 
-                    <ChatMessage key={index} message={msg.text} isUser={msg.isUser} />
+                    <ChatMessage key={index} content={message.content} role={message.role} />
 
                 ))}
             </div>
-            <form className='w-full flex justify-center md:4 ' onSubmit={ (event) => {
+
+            <form className='w-full flex justify-center md:4 ' onSubmit={(event) => {
                 event.preventDefault();
 
+                setMessageCount(messageCount + 1)
+
                 handleSendMessage();
-            }  }>
+            }}>
 
                 <input
                     type="text"
@@ -137,7 +176,6 @@ const ChatInterface = () => {
                 />
                 <button type='submit'
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-                    
                 >
                     Send
                 </button>
