@@ -159,7 +159,7 @@ const ChatInterface = () => {
                 ))}
             </div>
 
-            <form className='w-full flex justify-center md:4 ' onSubmit={(event) => {
+            <form className='w-full flex justify-center mb-4 ' onSubmit={(event) => {
                 event.preventDefault();
 
                 setMessageCount(messageCount + 1)
