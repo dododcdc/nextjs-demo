@@ -107,7 +107,7 @@ const ChatInterface = () => {
 
     const sendMessage = async () => {
 
-        const messagesHis = messages.slice(-7)
+        const messagesHis = messages.slice(-11)
 
         const stream = await model.chat.completions.create({
             model: 'deepseek-coder',
