@@ -106,7 +106,7 @@ const ChatInterface = () => {
 
     const sendMessage = async () => {
 
-        const messagesHis = messages.slice(-11)
+        const messagesHis = messages.slice(-15)
 
         const stream = await model.chat.completions.create({
             model: 'deepseek-coder',
@@ -127,8 +127,12 @@ const ChatInterface = () => {
 
     const handleSendMessage = async () => {
 
+        const userMsg = inputMessage;
 
-        setMessages([...messages, { role: 'user', content: inputMessage }]);
+        setInputMessage("");
+
+
+        setMessages([...messages, { role: 'user', content: userMsg }]);
     };
 
 
