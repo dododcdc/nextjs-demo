@@ -5,7 +5,6 @@ import OpenAI from 'openai';
 
 
 
-import { HumanMessage } from '@langchain/core/messages';
 
 
 import { useEffect, useState } from 'react';
@@ -96,7 +95,7 @@ const ChatInterface = () => {
 
 
     useEffect(() => {
-        // 如果messages的长度为奇数，那么就发送消息
+
        if(messageCount>=1) {
         sendMessage()
        }
@@ -130,23 +129,6 @@ const ChatInterface = () => {
 
 
         setMessages([...messages, { role: 'user', content: inputMessage }]);
-
-        // const msg = inputMessage
-        // setInputMessage('');
-        // if (msg.trim() !== '') {
-        //     setMessages([...messages, { role: 'user', content: msg }]);
-        //     const stream = await model.chat.completions.create({
-        //         model: 'deepseek-coder',
-        //         messages: [{role: 'user', content: "hi"},{role: 'assistant', content: "hello"}],
-        //         stream: true,
-        //     });
-        //     let str = ''
-        //     for await (const chunk of stream) {
-        //         str = str + `${chunk.choices[0]?.delta?.content}`
-        //         setMessages([...messages, { role: 'user', content: msg }, { role: 'assistant', content: str }]);
-        //     }
-
-        // }
     };
 
 
@@ -161,7 +143,7 @@ const ChatInterface = () => {
                 ))}
             </div>
 
-            <form className='w-full flex justify-center mb-4 ' onSubmit={(event) => {
+            <form className='w-full flex justify-center mb-5 ' onSubmit={(event) => {
                 event.preventDefault();
 
                 setMessageCount(messageCount + 1)
