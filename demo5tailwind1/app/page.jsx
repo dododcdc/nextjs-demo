@@ -5,8 +5,6 @@ import OpenAI from 'openai';
 
 
 
-
-
 import { useEffect, useState } from 'react';
 
 
@@ -16,7 +14,7 @@ import remarkGfm from 'remark-gfm';
 
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { materialDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { materialDark, okaidia, gruvboxDark,duotoneDark,funky,prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
 const ChatMessage = ({ content, role }) => {
@@ -41,7 +39,7 @@ const ChatMessage = ({ content, role }) => {
                                     PreTag="div"
                                     children={String(children).replace(/\n$/, '')}
                                     language={match[1]}
-                                    style={materialDark}
+                                    style={prism}
                                 />
                             ) : (
                                 <code {...rest} className={className}>
@@ -68,8 +66,8 @@ const ChatInterface = () => {
     useEffect(() => {
         setModel(new OpenAI(
             {
-                baseURL: 'https://api.deepseek.com',
-                apiKey: process.env.NEXT_PUBLIC_API_KEY_DEEP_SEEK,
+                baseURL: process.env.NEXT_PUBLIC_BASE_URL_KIMI,
+                apiKey: process.env.NEXT_PUBLIC_API_KEY_KIMI,
                 dangerouslyAllowBrowser: true
             }
         ));
@@ -109,7 +107,7 @@ const ChatInterface = () => {
         const messagesHis = messages.slice(-15)
 
         const stream = await model.chat.completions.create({
-            model: 'deepseek-coder',
+            model: process.env.NEXT_PUBLIC_MODEL_KIMI,
             messages: messagesHis,
             stream: true,
         });
